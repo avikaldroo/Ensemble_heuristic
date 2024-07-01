@@ -57,9 +57,12 @@ import pandas as pd
         row_count.append(total_rows)
         cl_lt.append(unique_values_set)
         un_cl_ct.append(unique_values_count)
+    #Create a dataframe with the rules and their outcomes
     final_rules_df = pd.DataFrame({'rules': iloc_rules, 'cluster_count':un_cl_ct , 'unique_clusters_tot':cl_lt,'row_count':row_count })
+    #Consider only rules with unique outcomes as a few rules truncated by the inTrees algorithm yield multiple outcomes however with low row counts
     final_rules_df = final_rules_df[final_rules_df['cluster_count']==1]
     final_rules_df['unique_clusters'] = final_rules_df['unique_clusters_tot'].apply(lambda x: next(iter(x)) if x else None)
+    #Store unique outcomes as strings
     final_rules_df = final_rules_df.drop(columns=['unique_clusters_tot'])
     return final_rules_df
 ########################################################################################################

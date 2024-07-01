@@ -33,3 +33,37 @@ def r_to_python_filter_final(r_filter_string, dataframe_name='x_df'):
     python_filter = ' & '.join(all_python_conditions)
 
     return python_filter
+######################################################################################
+def create_rule_df(R_rules_df,column,train_df):
+import pandas as pd
+    #Convert the imported dataframe of rules into a list
+    lt = R_rules_df['column'].tolist()
+    iloc_rules = []
+#Convert each rule in R to python and store in a list
+    for l in lt:
+        rl = r_to_python_filter_final(l)
+        iloc_rules.append(rl)
+
+    cl_lt = []
+    un_cl_ct = []
+    row_count = []
+    #Implement each rule on the training dataframe to get the respective outcome and corresponding row count 
+    for l in iloc_rules: 
+        x= train_df[eval(l)]
+        unique_values = x['Cluster'].unique()
+        total_rows = x.shape[0]
+        unique_values_set = set(map(str, unique_values))
+        unique_values_count = len(unique_values_set)
+        row_count.append(total_rows)
+        cl_lt.append(unique_values_set)
+        un_cl_ct.append(unique_values_count)
+    final_rules_df = pd.DataFrame({'rules': iloc_rules, 'cluster_count':un_cl_ct , 'unique_clusters_tot':cl_lt,'row_count':row_count })
+    final_rules_df = final_rules_df[final_rules_df['cluster_count']==1]
+    final_rules_df['unique_clusters'] = final_rules_df['unique_clusters_tot'].apply(lambda x: next(iter(x)) if x else None)
+    final_rules_df = final_rules_df.drop(columns=['unique_clusters_tot'])
+    return final_rules_df
+########################################################################################################
+
+
+
+

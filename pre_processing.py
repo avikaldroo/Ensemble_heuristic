@@ -1,4 +1,4 @@
-def r_to_python_filter_final(r_filter_string, dataframe_name='x_df'):
+def r_to_python_filter_final(r_filter_string, dataframe_name='train_df'):
     """
     Converts an advanced R-style filter string to a Python (pandas) filter string with separate conditions.
 
@@ -233,7 +233,7 @@ def parse_condition(condition):
     """
     Extract the column index, operator, and limit from a condition string.
     """
-    match = re.search(r'\(x_df\.iloc\[:, (\d+)\](<=|>=|<|>)(-?\d+\.?\d*)\)', condition)
+    match = re.search(r'\(train_df\.iloc\[:, (\d+)\](<=|>=|<|>)(-?\d+\.?\d*)\)', condition)
     if match:
         column_index = int(match.group(1))
         operator = match.group(2)
@@ -246,7 +246,7 @@ def create_altered_condition(column_index, operator, altered_limit):
     """
     Construct an altered condition string from its components.
     """
-    return f"(x_df.iloc[:, {column_index}]{operator}{altered_limit})"
+    return f"(train_df.iloc[:, {column_index}]{operator}{altered_limit})"
 ##########################################################################################################################################################
 def update_rule_with_altered_condition(altered_rule, altered_condition, original_condition):
     """

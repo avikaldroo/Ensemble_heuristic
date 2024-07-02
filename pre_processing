@@ -66,6 +66,68 @@ import pandas as pd
     final_rules_df = final_rules_df.drop(columns=['unique_clusters_tot'])
     return final_rules_df
 ########################################################################################################
+#Ascertain subsets of data against each rule
+def initial_filtering(final_rules, cluster_interest,x_df):  
+    filtered_xdf = x_df[x_df['Cluster'] == cluster_interest]
+
+    # The index of filtered_df now holds the original row numbers
+    original_row_numbers = filtered_xdf.index.tolist()
+
+    filtered_rules = final_rules[final_rules['unique_clusters'] == cluster_interest]
+    # Sort the filtered_rules DataFrame in descending order of 'row_count'
+    filtered_rules = filtered_rules.sort_values(by='row_count', ascending=False)
+
+    # Initialize an empty list to store the row indices for each rule
+    filtered_row_numbers = []
+
+    # Iterate through each rule in the sorted filtered_rules DataFrame
+    for rule in filtered_rules['rules']:
+        # Dynamically apply the filter to x_df
+        filtered_df = x_df[eval(rule)]
+
+        # Get the row numbers and append them to the list
+        row_numbers = filtered_df.index.tolist()
+        filtered_row_numbers.append(row_numbers)
+        # filtered_row_numbers now contains the row numbers for each rule
+    
+    return filtered_rules,original_row_numbers, filtered_row_numbers
+#####################################################################################################################
+#Ascertain the unique rows covered by each rule
+def calculate_coverage_and_rows(selected_rules,x_df,original_row_numbers):
+    covered_row_numbers = set()
+    proportion_lt = []
+    for condition in selected_rules:
+        filtered_x_df = x_df[eval(condition)]
+        covered_row_numbers.update(filtered_x_df.index.tolist())    
+    
+    proportion_common = len(covered_row_numbers.intersection(set(original_row_numbers))) / len(original_row_numbers) if original_row_numbers else 0
+        # Calculate the proportion of original rows covered by the selected conditions
+    return proportion_common, covered_row_numbers
+####################################################################################################################################
+#iteratively select individual rules for creating the subset representing 99%
+def select_next_rule(filtered_rules, filtered_row_numbers, covered_row_numbers, original_row_numbers):
+    
+    uncovered_row_numbers = list(set(original_row_numbers)-covered_row_numbers)
+    prop_lt = []
+
+    for c in range(1,10000):
+        combined_set = set().union(*filtered_row_numbers[c-1:c])
+
+        # Find the common indices between the combined set and the individual list
+        common_indices = combined_set.intersection(uncovered_row_numbers)
+
+        # Calculate the proportion of common indices
+        proportion_common = len(common_indices) / len(original_row_numbers) if original_row_numbers else 0
+        prop_lt.append(proportion_common)
+
+    sorted_list = sorted(enumerate(prop_lt), key=lambda x: x[1], reverse=True)
+
+    # Getting the top element
+    top_rule_index = sorted_list[0][0]
+    next_rule = filtered_rules.iloc[top_rule_index,1]
+    return next_rule,top_rule_index
+#########################################################################################################################################
+
 
 
 

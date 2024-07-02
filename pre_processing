@@ -128,6 +128,66 @@ def select_next_rule(filtered_rules, filtered_row_numbers, covered_row_numbers, 
     return next_rule,top_rule_index
 #########################################################################################################################################
 
+def prune_redundant_conditions(dataframe, rule):
+    conditions = rule.split(' & ')
+    pruned_conditions = conditions.copy()
+
+    for condition in conditions:
+        # Create an altered rule by removing the current condition
+        altered_conditions = [cond for cond in pruned_conditions if cond != condition]
+        altered_rule = ' & '.join(altered_conditions)
+
+        # Convert conditions to boolean masks and apply them
+        original_mask = eval(' & '.join([cond for cond in pruned_conditions]))
+        altered_mask = eval(' & '.join([ cond for cond in altered_conditions]))
+
+        # Filter dataframe using the masks
+        original_filtered_df = dataframe[original_mask]
+        altered_filtered_df = dataframe[altered_mask]
+
+        # Check if the filtered dataframes are the same
+        if original_filtered_df.equals(altered_filtered_df):
+            # If the same, remove the redundant condition
+            pruned_conditions.remove(condition)
+
+    # Reconstruct the pruned rule
+    pruned_rule = ' & '.join(pruned_conditions)
+    return pruned_rule
+
+def iteratively_find_most_effective_rule(dataframe, rule, cluster_of_interest):
+    previous_rule = rule
+    while True:
+        conditions = previous_rule.split(' & ')
+        effective_rules = []
+
+        for condition in conditions:
+            # Create an altered rule by removing the current condition
+            altered_conditions = [cond for cond in conditions if cond != condition]
+            altered_rule_str = ' & '.join(altered_conditions)
+
+            # Apply the altered rule using eval to create a boolean mask
+            altered_mask = eval(altered_rule_str)
+            filtered_df = dataframe[altered_mask]
+
+            # Check the criteria
+            cluster_count = filtered_df[filtered_df['Cluster'] == cluster_of_interest].shape[0]
+            total_count = filtered_df.shape[0]
+            rest_count = total_count - cluster_count
+            proportion = cluster_count / total_count if total_count > 0 else 0
+
+            if cluster_count > 0 and proportion > 0.99 and rest_count < 40:
+                effective_rules.append((altered_rule_str, cluster_count))
+
+        # Find the rule with the highest count of the cluster of interest
+        most_effective_rule = max(effective_rules, key=lambda x: x[1])[0] if effective_rules else None
+
+        # Break the loop if the most effective rule is the same as the previous rule
+        if most_effective_rule == previous_rule or most_effective_rule is None:
+            break
+
+        previous_rule = most_effective_rule
+
+    return previous_rule
 
 
 

@@ -535,7 +535,7 @@ def create_wrong_pred_df(final_lt_all,wrong_pred_df,new_df,pred_opt_lt):
     return wrong_pred_df,final
 ###################################################################################################################################################################################################
 
-def results_eval(test_df,original_solution, predicted_solution,n,original_parm_df,original_parameters,params= {}):
+def results_eval(test_df,original_solution, predicted_solution,n,original_parm_df,params= {}):
     test_df['pred_check'] = test_df['original_solution'] == test_df['predicted_solution']
     wrong_pred_df = test_df[ test_df['pred_check']== False]
     lt = []
@@ -546,8 +546,7 @@ def results_eval(test_df,original_solution, predicted_solution,n,original_parm_d
         lt.append(result)
     
     num_lt = gen_number_list_of_lists(lt,n,out_lt = [])
-    df = original_parm_df[original_parameters]
-    prm_list = create_prm_lt(wrong_pred_df,original_parameters)
+    prm_list = create_prm_lt(wrong_pred_df,original_parm_df)
     results_list,resolve_time, count = reverify_pred(prm_list,num_lt,n,params)
     final_lt = create_op_val_lt(results_list)
     pred_opt_lt = create_pred_opt_lt(final_lt)

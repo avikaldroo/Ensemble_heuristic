@@ -113,12 +113,26 @@ print(paste("Best F1 Score:", tuning_results$best_f1))
 
 # Store the best model
 rf <- tuning_results$best_model
+feature_importance <- importance(rf)
+
+# Order feature importance
+ordered_feature_importance <- sort(feature_importance, decreasing = TRUE)
+
+# Get ordered list of column indices
+ordered_column_indices <- order(-feature_importance) - 1 #adjusting according to python indices
+
+# Convert to dataframe
+feature_importance_df <- data.frame(
+  Column_Index = ordered_column_indices
+)
 
 
 treeList_df <- RF2List(rf)
 ruleExec_df <- extractRules(treeList_df,X,maxdepth= 50)
 ruleExec_df <- unique(ruleExec_df)
 rules_int <- as.data.frame(ruleExec_df)
+
 write_xlsx(rules_int,"extracted_rules.xlsx")
 write_xlsx(df2_train,"training_data.xlsx")
 write_xlsx(df2_test,"testing_data.xlsx")
+write_xlsx(feature_importance_df,"feature_importance.xlsx")

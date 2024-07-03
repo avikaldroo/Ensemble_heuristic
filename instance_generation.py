@@ -200,12 +200,12 @@ def tbr_model(prm_list,env = {}):
     final_df['Action'] = final_df.apply(lambda row: 'A' if row['Treatment'] == n_pr else ('I' if (row['Treatment'] == row['Infestation']) and (row['Treatment'] > 0)  else ('N' if row['Treatment'] == 0 else  ('S' if row['Treatment'] < row['Infestation'] else 'P')), axis=1)
     return final_df
 ########################################################################################################################################################################################################################################################################################################
-def convert_column_to_lists(df, column_name):
+def convert_column_to_lists(df, column_name,n_pr):
     column_data = df[column_name].tolist()
     result = []
 
-    for i in range(0, len(column_data), 6):
-        sublist = column_data[i:i+6]
+    for i in range(0, len(column_data), n_pr+1):
+        sublist = column_data[i:i+n_pr+1]
         result.append(sublist)
 
     return result
@@ -332,8 +332,10 @@ def process_list(input_list):
     return result         
 ####################################################################################################################################################
         
-def generate_df(final_df,n_pr):
-    p = convert_column_to_lists(final_df, 'Action')
+def generate_df(n_pr,env={}):
+    prm_list = generate_inputs()
+    final_df = tbr_model(prm_list,env)
+    p = convert_column_to_lists(final_df, 'Action',n_pr)
     y = create_separate_list(p)
     z = process_list(y)
 

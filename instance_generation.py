@@ -343,6 +343,9 @@ def generate_df(final_df,n_pr):
         k = mt.floor(u / (n_pr+1))
         l[u] = z[k] 
     final_df['Cluster'] = l
+    final_df = final_df[['theta','beta','c','s','alpha','rho','pi_l','pi','pi_h','gamma','Obj']]
+    final_df.drop_duplicates(inplace = True, drop = True)
+    final_df.reset_index(inplace = True, drop = True)
     return final_df
 
 

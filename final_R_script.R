@@ -24,14 +24,14 @@ train_proportion = 0.7
 train_indices <- createDataPartition(y_tot, p = train_proportion, list = FALSE, times = 1)
 df2_train <-df2[train_indices,]
 df2_test <- df2[-train_indices,]
-
+df2_org <- df1[train_indices,]
 
 
 
 
 
 tune_grid <- expand.grid(
-  ntree = c(50, 100, 200),
+  ntree = c(25,50,75, 100,125,150, 200),
   criterion = c("gini", "entropy"),
   minsplit = c(2, 5, 10)
 )
@@ -135,4 +135,5 @@ rules_int <- as.data.frame(ruleExec_df)
 write_xlsx(rules_int,"extracted_rules.xlsx")
 write_xlsx(df2_train,"training_data.xlsx")
 write_xlsx(df2_test,"testing_data.xlsx")
+write_xlsx(df2_org,"original_param_train.xlsx")
 write_xlsx(feature_importance_df,"feature_importance.xlsx")

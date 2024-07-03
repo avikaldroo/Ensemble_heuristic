@@ -536,7 +536,7 @@ def create_wrong_pred_df(final_lt_all,wrong_pred_df,new_df,pred_opt_lt):
 ###################################################################################################################################################################################################
 
 def results_eval(test_df,original_solution, predicted_solution,n,original_parm_df,params= {}):
-    test_df['pred_check'] = test_df['original_solution'] == test_df['predicted_solution']
+    test_df['pred_check'] = test_df[original_solution] == test_df[predicted_solution]
     wrong_pred_df = test_df[ test_df['pred_check']== False]
     lt = []
     pred_lt = wrong_pred_df.sati_pred.tolist()

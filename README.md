@@ -5,7 +5,7 @@ The file "executable.ipynb" contains the executable file for running the algorit
 
 In the "executable.ipynb" file execute the blocks in the folowing sequence:
 
-1. import the libraries and modules, run Code block 1
+1. Import the libraries and modules, run Code block 1
 2. Run the R script after running the Code block 1
 3. After running the R script run the code block 2,3,4,5 in the respective order. 
 
